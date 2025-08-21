@@ -1,0 +1,56 @@
+services:
+  ui:
+    image: cr.meg-infrastructure.cloud.edu.au/prescient/dpinterview@sha256:fa14e49b76f901e636443544567ef6bfdbc6b8f11eae685b454475a9086e508b
+    build:
+      dockerfile: Dockerfile
+      context: .
+      args:
+        IMAGE_PREFIX: "${IMAGE_PREFIX:-docker.io/library}"
+      platforms:
+        - linux/amd64
+        - linux/arm64
+    environment:
+      PGHOST: db
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: dpinterview
+    init: true
+    depends_on:
+      - db
+  db:
+    image: "postgres:17-trixie"
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./dump.sql:/docker-entrypoint-initdb.d/99_dump.sql
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dpinterview
+  populate:
+    image: cr.meg-infrastructure.cloud.edu.au/prescient/dpinterview@sha256:fa14e49b76f901e636443544567ef6bfdbc6b8f11eae685b454475a9086e508b
+    volumes:
+      - static_assets:/app/.next/static/
+    command: [ "npm","version" ]
+  fileserver:
+    image: caddy:2.10.0-alpine
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    volumes:
+      - static_assets:/var/lib/static:ro
+      - ./site:/var/lib/filer:ro
+      - ./conf:/etc/caddy/:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      ui:
+        required: true
+        condition: service_started
+      populate:
+        condition: service_completed_successfully
+        required: true
+volumes:
+  db: { }
+  caddy_data: { }
+  caddy_config: { }
+  static_assets: { }

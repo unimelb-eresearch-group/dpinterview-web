@@ -1,0 +1,26 @@
+{
+	debug
+}
+
+:8080 {
+
+    # Lookup NextJs static files locally
+    handle_path /_next/static/* {
+        encode
+    	root /var/lib/static
+		try_files {path} /index.html
+		file_server
+    }
+
+    # Lookup files under mounted directory
+    handle_path /payload/* {
+    	root * /var/lib/filer
+		try_files {path} /index.html
+		file_server
+    }
+
+    handle /* {
+        reverse_proxy ui:3000
+    }
+
+}
