@@ -1,18 +1,21 @@
-import { Pool } from 'pg';
+import {URL} from "node:url";
+import {env} from "@/env";
+import {Pool, PoolConfig} from 'pg';
 
-let connection: Pool | undefined;
+const connection: Pool = new Pool(makeConfig());
 
-if (!connection) {
-    connection = new Pool({
-        user: process.env.PG_user,
-        host: process.env.PG_host,
-        database: process.env.PG_database,
-        password: process.env.PG_password,
-        port: process.env.PG_port ? parseInt(process.env.PG_port, 10) : undefined,
+function makeConfig(): PoolConfig {
+    const dbUrl = new URL(env.DATABASE_URL);
+    return {
+        user: dbUrl.username,
+        host: dbUrl.host,
+        database: dbUrl.pathname,
+        password: dbUrl.password,
+        port: parseInt(dbUrl.port),
         ssl: {
             rejectUnauthorized: false,
         }
-    });
+    };
 }
 
 export function getConnection(): Pool {
