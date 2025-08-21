@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+package_version="$(jq -r '.version' package.json)"
+VERSION="v${package_version:-latest}"
+TAG="${TAG:-cr.meg-infrastructure.cloud.edu.au/prescient/dpinterview}"
+IMAGE_NAME="${TAG}:${VERSION}"
+SOURCE_DATE_EPOCH="$(git log -1 --pretty=%ct)"
+export SOURCE_DATE_EPOCH
+
+function run() {
+  docker buildx build \
+    --tag "${TAG}:${VERSION}" \
+    --build-arg IMAGE_PREFIX=cr.meg-infrastructure.cloud.edu.au/docker/library \
+    --output "type=image,name=${IMAGE_NAME},push=true,rewrite-timestamp=true" \
+    --platform linux/amd64,linux/arm64 \
+    .
+}
+
+run
