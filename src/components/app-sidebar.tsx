@@ -25,6 +25,7 @@ import {
 
 import { NavMain } from "@/components/nav-main"
 import { NavSecondary } from "@/components/nav-secondary"
+import { usePathname } from "next/navigation"
 
 
 export const navData = {
@@ -66,7 +67,19 @@ export const navData = {
             title: "Interviews",
             icon: Video,
             url: "/interviews",
-            items: [],
+            isActive: true,
+            items: [
+                {
+                    title: "Pending QC",
+                    url: "/interviews/qc/pending",
+                    isActive: false,
+                },
+                {
+                    title: "Completed QC",
+                    url: "/interviews/qc/completed",
+                    isActive: false,
+                },
+            ],
         },
         {
             title: "Audio Journals",
@@ -91,6 +104,25 @@ export const navData = {
 
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+
+    const pathname = usePathname()
+
+    function setActive(items: any[]) {
+        return items.map(item => {
+            const isActive = pathname === item.url || (item.items && item.items.some((sub: any) => pathname === sub.url))
+            const newItem = { ...item, isActive }
+            if (item.items && item.items.length > 0) {
+                newItem.items = setActive(item.items)
+            }
+            return newItem
+        })
+    }
+
+    const navDataWithActive = {
+        navMain: setActive(navData.navMain),
+        navSecondary: setActive(navData.navSecondary),
+    }
+
     return (
         <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
@@ -111,8 +143,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
-                <NavMain items={navData.navMain} />
-                <NavSecondary items={navData.navSecondary} className="mt-auto" />
+                <NavMain items={navDataWithActive.navMain} />
+                <NavSecondary items={navDataWithActive.navSecondary} className="mt-auto" />
             </SidebarContent>
             <SidebarRail />
         </Sidebar>
