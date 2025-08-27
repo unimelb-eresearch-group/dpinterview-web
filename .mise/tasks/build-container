@@ -12,7 +12,7 @@ export SOURCE_DATE_EPOCH
 function run() {
   docker buildx build \
     --tag "${TAG}:${VERSION}" \
-    --build-arg IMAGE_PREFIX=cr.meg-infrastructure.cloud.edu.au/docker/library \
+    --build-arg "IMAGE_PREFIX=cr.meg-infrastructure.cloud.edu.au/docker/library" \
     --output "type=image,name=${IMAGE_NAME},push=true,rewrite-timestamp=true" \
     --platform linux/amd64,linux/arm64 \
     .

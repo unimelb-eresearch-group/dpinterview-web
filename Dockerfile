@@ -12,12 +12,13 @@ RUN --mount=type=cache,target=/root/.npm npm ci
 
 
 # Rebuild the source code only when needed
+
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-
-RUN npm run build
+RUN cp .env.example .env \
+    && npm run build
 
 # Production image, copy all the files and run next
 ARG IMAGE_PREFIX="docker.io/library"

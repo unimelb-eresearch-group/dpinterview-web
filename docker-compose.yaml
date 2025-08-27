@@ -1,6 +1,6 @@
 services:
   ui:
-    image: cr.meg-infrastructure.cloud.edu.au/prescient/dpinterview@sha256:fa14e49b76f901e636443544567ef6bfdbc6b8f11eae685b454475a9086e508b
+    image: cr.meg-infrastructure.cloud.edu.au/prescient/dpinterview:latest
     build:
       dockerfile: Dockerfile
       context: .
@@ -10,24 +10,23 @@ services:
         - linux/amd64
         - linux/arm64
     environment:
-      PGHOST: db
-      PGUSER: postgres
-      PGPASSWORD: postgres
-      PGDATABASE: dpinterview
+      PGSSLMODE: "disable"
+      DATABASE_URL: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}"
     init: true
     depends_on:
       - db
   db:
     image: "postgres:17-trixie"
+    shm_size: 128mb
     volumes:
       - db:/var/lib/postgresql/data
-      - ./dump.sql:/docker-entrypoint-initdb.d/99_dump.sql
+      - ./dump_cleaned.sql:/docker-entrypoint-initdb.d/99_dump.sql
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: dpinterview
   populate:
-    image: cr.meg-infrastructure.cloud.edu.au/prescient/dpinterview@sha256:fa14e49b76f901e636443544567ef6bfdbc6b8f11eae685b454475a9086e508b
+    image: cr.meg-infrastructure.cloud.edu.au/prescient/dpinterview:latest
     volumes:
       - static_assets:/app/.next/static/
     command: [ "npm","version" ]
