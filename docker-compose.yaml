@@ -29,7 +29,7 @@ services:
     image: cr.meg-infrastructure.cloud.edu.au/prescient/dpinterview:latest
     volumes:
       - static_assets:/app/.next/static/
-    command: [ "npm","version" ]
+    command: [ "npm","version" ] # generic command so it can exit cleanly. Probably unnecessary
   fileserver:
     image: caddy:2.10.0-alpine
     restart: unless-stopped
