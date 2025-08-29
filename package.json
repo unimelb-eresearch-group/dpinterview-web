@@ -7,7 +7,7 @@
     "build": "next build",
     "build:container": "docker buildx build --tag ${container_name:-dpinterview}:latest --tag ${container_name:-dpinterview}:$npm_package_version ./",
     "start": "npm run start:server",
-    "prestart:server": "next build && cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/",
+    "prestart:server": "cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/",
     "start:server": "node .next/standalone/server.js",
     "start:compose": "docker compose --file docker-compose.yaml up -d",
     "docker-compose": "docker compose --file docker-compose.yaml",
