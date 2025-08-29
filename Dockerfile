@@ -34,17 +34,19 @@ RUN addgroup --system --gid 1001 nodejs \
     && adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
-
 # Automatically leverage output traces to reduce image size
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs --chmod=0444 /app/healthcheck.mjs /app/healthcheck.mjs
 
 USER nextjs
 
 EXPOSE 3000
 
 ENV PORT=3000
+
+HEALTHCHECK --interval=5m --timeout=1s --start-period=5s --retries=5 CMD /usr/local/bin/node healthcheck.mjs
 
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
