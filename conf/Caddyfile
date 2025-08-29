@@ -24,3 +24,10 @@
     }
 
 }
+
+:8081 {
+    handle_path /health {
+        respond "OK" 200
+    }
+    respond 404
+}
