@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "build:container": "docker buildx build --tag ${container_name:-dpinterview}:latest --tag ${container_name:-dpinterview}:$npm_package_version ./",
+    "build:container": "docker buildx build --tag ${container_name:-dpinterview}/dpinterview:latest --tag ${container_name:-dpinterview}/dpinterview:$npm_package_version ./",
+    "build:container:caddy": "docker buildx build --tag ${container_name:-dpinterview}/caddy:latest --tag ${container_name:-dpinterview}/caddy:$npm_package_version --target=caddy ./",
     "start": "npm run start:server",
     "prestart:server": "cp -r public .next/standalone/ && cp -r .next/static .next/standalone/.next/",
     "start:server": "node .next/standalone/server.js",

@@ -22,6 +22,15 @@ RUN cp .env.example .env \
 
 # Production image, copy all the files and run next
 ARG IMAGE_PREFIX="docker.io/library"
+FROM ${IMAGE_PREFIX}/caddy:2.10.2-alpine AS caddy
+RUN rm /etc/caddy/Caddyfile
+COPY conf/Caddyfile /etc/caddy/Caddyfile
+
+COPY --from=builder /app/.next/static/ /var/lib/static/
+
+
+# Production image, copy all the files and run next
+ARG IMAGE_PREFIX="docker.io/library"
 FROM ${IMAGE_PREFIX}/node:22-trixie-slim AS runner
 
 WORKDIR /app
@@ -52,3 +61,4 @@ HEALTHCHECK --interval=5m --timeout=1s --start-period=5s --retries=5 CMD /usr/lo
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
 ENV HOSTNAME="0.0.0.0"
 CMD ["node", "server.js"]
+
