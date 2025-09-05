@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { TranscriptFiles } from '@/lib/models/TranscriptFiles';
+import {makeFileUrl} from "@/lib/utils";
 
 export async function GET(
     request: Request,
@@ -22,6 +23,6 @@ export async function GET(
     // Redirect to the transcript file URL
     // http://localhost:45000/payload=[<path>]
 
-    const redirectUrl = new URL(`http://localhost:45000/payload=[${transcriptFile}]`);
+    const redirectUrl = makeFileUrl(transcriptFile);
     return NextResponse.redirect(redirectUrl);
 }

@@ -17,6 +17,8 @@ import { DbAudioJournal } from '@/lib/types/audio_journals';
 import Transcript from '@/components/domain/TranscriptE';
 
 import { toast } from "sonner";
+import {env} from "@/env";
+import {makeFileUrl} from "@/lib/utils";
 
 export default function Page({
     params,
@@ -112,7 +114,7 @@ export default function Page({
                 {journalData && (
                     <div className="flex justify-center my-4">
                         <audio
-                            src={`http://localhost:45000/payload=%5B${journalData.aj_path}%5D`}
+                            src={ makeFileUrl(journalData.aj_path).toString() }
                             controls
                             style={{ width: '100%' }}
                             onError={() => {

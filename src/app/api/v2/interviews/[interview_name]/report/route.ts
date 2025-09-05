@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 
 import { PdfReports } from "@/lib/models/PdfReports";
+import {makeFileUrl} from "@/lib/utils";
 
 export async function GET(
     request: Request,
@@ -22,6 +23,6 @@ export async function GET(
     // Redirect to the Report file URL
     // http://localhost:45000/payload=[<path>]
 
-    const redirectUrl = new URL(`http://localhost:45000/payload=[${pdfReportData.pr_path}]`);
+    const redirectUrl = makeFileUrl(pdfReportData.pr_path);
     return NextResponse.redirect(redirectUrl);
 }

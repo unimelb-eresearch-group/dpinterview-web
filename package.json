@@ -1,6 +1,6 @@
 {
   "name": "dpinterview-web",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -12,7 +12,7 @@
     "start:server": "node .next/standalone/server.js",
     "start:compose": "docker compose --file docker-compose.yaml up -d",
     "docker-compose": "docker compose --file docker-compose.yaml",
-    "lint": "next lint",
+    "lint": "eslint .",
     "preview": "next build && next start"
   },
   "dependencies": {
