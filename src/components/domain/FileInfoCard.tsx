@@ -22,7 +22,7 @@ import { Person } from '@mui/icons-material';
 import { GraphicEq } from '@mui/icons-material';
 
 import { toast } from "sonner";
-import {makeFileUrl} from "@/lib/utils";
+import {makeFilePath} from "@/lib/utils";
 
 const { Paragraph } = Typography;
 
@@ -284,7 +284,7 @@ export default function FileInfoCard(props: FileInfoCardProps) {
                     render_element === 'audio' ? (
                         <audio
                             id="player"
-                            src={ makeFileUrl(props.file_path).toString() }
+                            src={ makeFilePath(props.file_path) }
                             controls
                             style={{ width: '100%' }}
                             onError={() => {
@@ -300,7 +300,7 @@ export default function FileInfoCard(props: FileInfoCardProps) {
                     ) : (
                         <video
                             id="player"
-                            src={ makeFileUrl(props.file_path).toString() }
+                            src={ makeFilePath(props.file_path) }
                             controls
                             onError={() => {
                                 toast.error("Failed to load video file. The file may be missing or the media server is not running.");

@@ -18,7 +18,7 @@ import Transcript from '@/components/domain/TranscriptE';
 
 import { toast } from "sonner";
 import {env} from "@/env";
-import {makeFileUrl} from "@/lib/utils";
+import {makeFilePath} from "@/lib/utils";
 
 export default function Page({
     params,
@@ -114,7 +114,7 @@ export default function Page({
                 {journalData && (
                     <div className="flex justify-center my-4">
                         <audio
-                            src={ makeFileUrl(journalData.aj_path).toString() }
+                            src={ makeFilePath(journalData.aj_path) }
                             controls
                             style={{ width: '100%' }}
                             onError={() => {

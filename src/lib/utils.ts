@@ -6,10 +6,9 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs))
 }
 
-export function makeFileUrl(path: string): URL {
+export function makeFilePath(path: string): string {
     // Remove prefix if set
-    path.replace(env.NEXT_PUBLIC_PATH_PREFIX, "");
-
-    const output = new URL(path, env.NEXT_PUBLIC_FILE_PREFIX);
-    return output;
+    const trimmedPath = path.replace(new RegExp(`^${env.NEXT_PUBLIC_PATH_PREFIX}/{0,1}`,"m"), "");
+    // Form new path and replace any runs of `/` from a single `/`
+    return [env.NEXT_PUBLIC_FILE_PREFIX, trimmedPath].join("/").replace(/\/{2,}/, "/");
 }

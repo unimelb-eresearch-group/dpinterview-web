@@ -1,11 +1,12 @@
-import { NextResponse } from 'next/server';
+import {NextRequest, NextResponse} from 'next/server';
 
 import { TranscriptFiles } from '@/lib/models/TranscriptFiles';
 
-import {makeFileUrl} from "@/lib/utils";
+import {makeFilePath} from "@/lib/utils";
+import {NextURL} from "next/dist/server/web/next-url";
 
 export async function GET(
-    request: Request,
+    request: NextRequest,
     props: { params: Promise<{ study_id: string, subject_id: string, journal_name: string }> }
 ): Promise<Response> {
     const params = await props.params;
@@ -29,6 +30,7 @@ export async function GET(
     // Redirect to the transcript file URL
     // http://localhost:45000/payload=[<path>]
 
-    const redirectUrl = makeFileUrl(transcriptFile);
+    const redirectPath = makeFilePath(transcriptFile);
+    const redirectUrl = new NextURL(redirectPath,request.nextUrl);
     return NextResponse.redirect(redirectUrl);
 }
