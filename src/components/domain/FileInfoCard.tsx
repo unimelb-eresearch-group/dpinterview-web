@@ -20,6 +20,7 @@ import People from '@mui/icons-material/People';
 import { InterpreterMode } from '@mui/icons-material';
 import { Person } from '@mui/icons-material';
 import { GraphicEq } from '@mui/icons-material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 import { toast } from "sonner";
 
@@ -36,6 +37,7 @@ export type FileInfoCardProps = {
     tags: string[];
     ignored: boolean;
     onTagsChange?: (tags: string[]) => void;
+    onIgnoredChange?: (ignored: boolean) => void;
     currentAudioTime?: number;
     setCurrentAudioTime?: (time: number) => void;
 };
@@ -120,6 +122,35 @@ function setRole(
     return Promise.resolve();
 }
 
+async function toggleIgnored(props: FileInfoCardProps): Promise<void> {
+    const interview_name = props.interview_name;
+    const file_path = props.file_path;
+
+    const body: Record<string, any> = {};
+    body.interview_name = interview_name;
+    body.file_path = file_path;
+    body.ignored = !props.ignored;
+
+    fetch(`/api/v1/interview-files/set-ignore`, {
+        method: 'POST',
+        body: JSON.stringify(body),
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to toggle ignored state');
+        }
+    })
+    .then(() => {
+        // Update the ignored state in the props
+        if (props.onIgnoredChange) {
+            props.onIgnoredChange(!props.ignored);
+        }
+    });
+}
+
 export default function FileInfoCard(props: FileInfoCardProps) {
     const { currentAudioTime } = props;
 
@@ -170,7 +201,30 @@ export default function FileInfoCard(props: FileInfoCardProps) {
         {
             key: '6',
             label: 'Ignored',
-            children: props.ignored ? 'Yes' : 'No',
+            children: (
+                <div className="flex items-center gap-2">
+                    <span>{props.ignored ? 'Yes' : 'No'}</span>
+                    <ButtonGroup variant="text" aria-label="ignore-toggle" size="small">
+                        <Tooltip title={props.ignored ? "Unignore file" : "Ignore file"}>
+                            <IconButton aria-label="toggle-ignore" onClick={() => {
+                                const promise = toggleIgnored(props);
+                                toast.promise(promise, {
+                                    loading: props.ignored ? 'Unignoring file...' : 'Ignoring file...',
+                                    success: props.ignored ? 'File unignored' : 'File ignored',
+                                    error: 'Failed to toggle ignored',
+                                });
+                            }}>
+                                {/* Use VisibilityOff for ignored, Visibility for not ignored */}
+                                {props.ignored ? (
+                                    <VisibilityOff color="error" />
+                                ) : (
+                                    <Visibility color="inherit" />
+                                )}
+                            </IconButton>
+                        </Tooltip>
+                    </ButtonGroup>
+                </div>
+            ),
         },
     ];
 

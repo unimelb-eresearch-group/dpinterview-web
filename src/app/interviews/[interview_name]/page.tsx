@@ -97,6 +97,29 @@ function interviewFileOnTagsChange(
     // console.log('Updated interview files:', newInterview);
 }
 
+function interviewFileOnIgnore(
+    interview_file_path: string,
+    interview: Interview,
+    ignored: boolean,
+    setInterview: (interview: Interview) => void
+) {
+    const updatedFiles = interview.parts.map((part) => {
+        part.interview_files.map((file) => {
+            if (file.interview_file.file_path === interview_file_path) {
+                file.ignored = ignored;
+            }
+            return file;
+        });
+        return part;
+    });
+
+    const newInterview = {
+        ...interview,
+        parts: updatedFiles,
+    };
+    setInterview(newInterview);
+}
+
 // ts-ignore
 export default function Page({
     params,
@@ -172,6 +195,8 @@ export default function Page({
                         // Add file to files
                         tempFiles[file.interview_file.file_path] = file.interview_file
                         tempFiles[file.interview_file.file_path].interview_file_tags = file.interview_file_tags;
+
+                        tempFiles[file.interview_file.file_path].ignored = file.ignored;
                     });
             });
 
@@ -239,6 +264,14 @@ export default function Page({
                         files[lastSelectedItem].file_path,
                         interviews as Interview,
                         tags,
+                        setInterviews,
+                    );
+                },
+                onIgnoredChange: (ignored: boolean) => {
+                    interviewFileOnIgnore(
+                        files[lastSelectedItem].file_path,
+                        interviews as Interview,
+                        ignored,
                         setInterviews,
                     );
                 },

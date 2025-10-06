@@ -106,4 +106,14 @@ export class InterviewFiles {
         return updatedTagsString;
     }
 
+    static async setIgnoreFile(file_path: string, ignored: boolean): Promise<void> {
+        const connection = getConnection();
+        const updateQuery = `
+            UPDATE interview_files
+            SET ignored = $1
+            WHERE interview_file = $2
+        `;
+        await connection.query(updateQuery, [ignored, file_path]);
+    }
+
 }
