@@ -9,6 +9,7 @@ export type DbManualQc = {
     qc_data: {
         hasNoIssues: boolean;
         identifiedIssues: string[];
+        uploadToNda?: boolean;
         comments?: string;
     }
     qc_user_id: string;
@@ -19,6 +20,7 @@ export type QcFormSchema = {
     inteviewName: string;
     hasNoIssues: boolean;
     identifiedIssues: string[];
+    uploadToNda?: boolean;
     comments?: string;
     qcUser: string;
     qcDatetime?: Date;  // Ignored

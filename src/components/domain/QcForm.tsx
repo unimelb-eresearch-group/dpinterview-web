@@ -22,6 +22,7 @@ import { DbManualQc } from "@/lib/types/manual_qc";
 const formSchema = z.object({
     interviewName: z.string().min(1, { message: "Interview name is required" }),
     hasNoIssues: z.boolean(),
+    uploadToNda: z.boolean().optional(),
     identifiedIssues: z.array(z.string()).optional(),
     comments: z.string().optional(),
     qcDatetime: z.string().optional(),  // Ignored
@@ -73,6 +74,7 @@ export default function QcForm(
         if (qcData && qcData.qc_data) {
             form.setValue("hasNoIssues", qcData.qc_data.hasNoIssues);
             form.setValue("identifiedIssues", qcData.qc_data.identifiedIssues || []);
+            form.setValue("uploadToNda", qcData.qc_data.uploadToNda || false);
             form.setValue("comments", qcData.qc_data.comments || "");
             form.setValue("qcDatetime", qcData.qc_timestamp);
             form.setValue("qcUser", qcData.qc_user_id);
@@ -85,6 +87,7 @@ export default function QcForm(
             interviewName: interviewName,
             hasNoIssues: false,
             identifiedIssues: [],
+            uploadToNda: false,
             comments: "",
             qcDatetime: new Date().toISOString(),
             qcUser: "",
@@ -190,6 +193,8 @@ export default function QcForm(
                                             { value: "not_gallery_view", label: "Not in Zoom Gallery view" },
                                             { value: "participants_switched", label: "Interviewer / Subject switched" },
                                             { value: "wrong_orientation", label: "Wrong Video Orientation" },
+                                            { value: "face_obstructed", label: "Face Obstructed" },
+                                            { value: "bad_lighting", label: "Bad Lighting" },
                                             { value: "audio_sync", label: "Audio Out of Sync" },
                                             { value: "other", label: "Other" },
                                         ].map((issue) => (
@@ -227,6 +232,37 @@ export default function QcForm(
                                                 })()}
                                             </div>
                                         ))}
+                                    </div>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </div>
+
+                    <div className="border rounded-lg p-6 bg-slate-50">
+                        <h2 className="text-lg font-semibold mb-4 text-slate-800">NIMH Data Archive</h2>
+
+                        <FormField
+                            control={form.control}
+                            name="uploadToNda"
+                            render={({ field }) => (
+                                <FormItem className="pb-4">
+                                    <div className="flex flex-row items-start space-x-3 space-y-0">
+                                        <FormControl>
+                                            <Checkbox
+                                                checked={field.value}
+                                                onCheckedChange={field.onChange}
+                                                className="mt-1"
+                                            />
+                                        </FormControl>
+                                        <div className="space-y-1 leading-none">
+                                            <FormLabel className="text-base font-medium">
+                                                Upload to NIMH Data Archive
+                                            </FormLabel>
+                                            <FormDescription>
+                                                Check this if features from this interview should be uploaded to NDA.
+                                            </FormDescription>
+                                        </div>
                                     </div>
                                     <FormMessage />
                                 </FormItem>
