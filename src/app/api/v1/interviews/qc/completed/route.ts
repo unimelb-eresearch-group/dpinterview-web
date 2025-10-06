@@ -16,7 +16,8 @@ export async function GET(request: Request): Promise<Response> {
 
     const baseQuery = `
     SELECT DISTINCT
-        i.*
+        i.*,
+        mqc.qc_timestamp
     FROM video_quick_qc AS vq
     LEFT JOIN decrypted_files AS df ON vq.video_path = df.destination_path
     LEFT JOIN interview_files AS iff ON df.source_path = iff.interview_file
@@ -24,6 +25,7 @@ export async function GET(request: Request): Promise<Response> {
     LEFT JOIN interviews AS i USING (interview_name)
     LEFT JOIN manual_qc AS mqc ON ip.interview_name = mqc.qc_target_id AND mqc.qc_target_type = 'interview'
     WHERE mqc.qc_target_id IS NOT NULL
+    ORDER BY mqc.qc_timestamp DESC
     `;
 
     const countQuery = `SELECT COUNT(*) FROM (${baseQuery}) AS total_count`;
