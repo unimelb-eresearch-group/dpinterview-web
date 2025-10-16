@@ -30,6 +30,8 @@ export async function GET(request: Request): Promise<Response> {
         params.push(subjectId);
     }
 
+    baseQuery += ` ORDER BY aj_datetime DESC`;
+
     const countQuery = `SELECT COUNT(*) FROM (${baseQuery}) AS total_count`;
     const countResult = await connection.query(countQuery);
     const totalRows = countResult.rows[0].count;
