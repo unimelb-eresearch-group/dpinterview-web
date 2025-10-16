@@ -25,6 +25,16 @@ export default function Home() {
                             </Typography>
                         </div>
                     </Link>
+                    <Link href="/issues/multiCombinedAudio" underline="none" color="inherit">
+                        <div className="border border-l-4 border-l-amber-400 rounded-lg p-4 hover:shadow-md transition-shadow bg-amber-50/30">
+                            <Typography level="h4" sx={{ mb: 2, color: 'text.secondary' }}>
+                                📹 Multi-Combined Audio Interviews
+                            </Typography>
+                            <Typography level="body-md">
+                                Help identify the audio files that should be transcribed (and what should be ignored)
+                            </Typography>
+                        </div>
+                    </Link>
                     <Link href="/issues/unlabelledAudio" underline="none" color="inherit">
                         <div className="border border-l-4 border-l-teal-400 rounded-lg p-4 hover:shadow-md transition-shadow bg-teal-50/30">
                             <Typography level="h4" sx={{ mb: 2, color: 'text.secondary' }}>

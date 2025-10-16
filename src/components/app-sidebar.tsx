@@ -42,6 +42,11 @@ export const navData = {
                     isActive: false,
                 },
                 {
+                    title: "Multi-Combined Audio Files",
+                    url: "/issues/multiCombinedAudio",
+                    isActive: false,
+                },
+                {
                     title: "Unlabelled Audio",
                     url: "/issues/unlabelledAudio",
                     isActive: false,
