@@ -5,7 +5,7 @@ import { DbInterviewFile, InterviewFile } from "@/lib/types/interview";
 
 type InterviewFileJoinFile = DbInterviewFile & DbFile;
 
-const availableRoles = ['interviewer', 'participant', 'uncategorized'];
+const availableRoles = ['interviewer', 'participant', 'combined', 'uncategorized'];
 
 export class InterviewFiles {
     static async get(interview_path: string): Promise<InterviewFile[]> {
@@ -55,20 +55,38 @@ export class InterviewFiles {
 
     static async addRoleTag(file_path: string, role: string): Promise<string> {
         const connection = getConnection();
-        const currentRolwQuery = `
+        const currentRoleQuery = `
             SELECT interview_file_tags
             FROM interview_files
             WHERE interview_file = $1
         `;
-        const currentRoleResult = await connection.query(currentRolwQuery, [file_path]);
+        const currentRoleResult = await connection.query(currentRoleQuery, [file_path]);
         const currentRoleRow = currentRoleResult.rows[0];
         const currentTags = currentRoleRow ? currentRoleRow.interview_file_tags.split(',').map((tag: string) => tag.trim()) : [];
 
         // Remove existing role tag if it exists
-        const updatedTags = currentTags.filter((tag: string) => !availableRoles.some((role: string) => tag.toLowerCase().includes(role)));
+        let updatedTags = currentTags.filter((tag: string) => !availableRoles.some((role: string) => tag.toLowerCase().includes(role)));
+
+        // if new role is 'combined', also remove 'diarized'
+        if (role.toLowerCase().includes('combined')) {
+            updatedTags = updatedTags.filter((tag: string) => !tag.toLowerCase().includes('diarized'));
+        } else {
+            // if new role is 'interviewer' or 'participant', also remove 'combined'
+            if (role.toLowerCase().includes('interviewer') || role.toLowerCase().includes('participant')) {
+                updatedTags = updatedTags.filter((tag: string) => !tag.toLowerCase().includes('combined'));
+                // Add 'diarized' tag
+                updatedTags.push('diarized');
+            }
+        }
+
         // Add the new role tag
         updatedTags.push(role);
-        const updatedTagsString: string = updatedTags.join(',');
+
+        // ensure set (no duplicates)
+        const uniqueTags = new Set(updatedTags);
+        const updatedTagsArray = Array.from(uniqueTags);
+
+        const updatedTagsString: string = updatedTagsArray.join(',');
 
         const updateQuery = `
             UPDATE interview_files

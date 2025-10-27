@@ -196,6 +196,10 @@ export default function QcForm(
                                             { value: "face_obstructed", label: "Face Obstructed" },
                                             { value: "bad_lighting", label: "Bad Lighting" },
                                             { value: "audio_sync", label: "Audio Out of Sync" },
+                                            { value: "no_video", label: "WebCam Not Open" },
+                                            { value: "miscategorized", label: "Miscategorized Interview Types" },
+                                            { value: "multiple_zoom_users", label: "Multiple Zoom Users" },
+                                            { value: "multiple_faces", label: "Multiple Faces in Frame" },
                                             { value: "other", label: "Other" },
                                         ].map((issue) => (
                                             <div key={issue.value} className="flex items-center space-x-2 p-2 rounded border bg-white">

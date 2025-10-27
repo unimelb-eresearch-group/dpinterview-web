@@ -33,19 +33,20 @@ export async function GET(request: Request): Promise<Response> {
 }
 
 export async function POST(request: Request): Promise<Response> {
-    const url = new URL(request.url);
-    const interview_path = url.searchParams.get('interview_path');
+    // const url = new URL(request.url);
+    // const interview_path = url.searchParams.get('interview_path');
 
-    if (!interview_path) {
-        return new Response(JSON.stringify({ error: 'Missing interview_path parameter' }), {
-            status: 400,
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-    }
+    // if (!interview_path) {
+    //     return new Response(JSON.stringify({ error: 'Missing interview_path parameter' }), {
+    //         status: 400,
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //         },
+    //     });
+    // }
 
     const body = await request.json();
+    const interview_path: string = body.interview_path;
     const interview_name: string = body.interview_name;
 
     if (body.is_primary === undefined && body.is_duplicate === undefined) {

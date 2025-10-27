@@ -231,7 +231,8 @@ export default function FileInfoCard(props: FileInfoCardProps) {
     if (props.tags && props.tags.length > 0) {
         // Push Chips to Stack
         const stack: React.ReactNode[] = [];
-        let isDiarized = false;
+        // let isDiarized = false;
+        let isAudio = false;
         for (let i = 0; i < props.tags.length; i++) {
             let icon: React.ReactNode = <QuestionMark />;
             let color: "error" | "default" | "primary" | "secondary" | "info" | "success" | "warning" = 'default';
@@ -239,13 +240,14 @@ export default function FileInfoCard(props: FileInfoCardProps) {
                 icon = <VideoFile />;
                 color = 'secondary';
             } else if (props.tags[i].toLowerCase().includes('audio')) {
+                isAudio = true;
                 icon = <AudioFile />;
                 color = 'primary';
                 render_element = 'audio';
             } else if (props.tags[i].toLowerCase().includes('diarized')) {
                 icon = <People />;
                 color = 'info';
-                isDiarized = true;
+                // isDiarized = true;
             } else if (props.tags[i].toLowerCase().includes('interviewer')) {
                 icon = <InterpreterMode />;
                 color = 'warning';
@@ -298,6 +300,19 @@ export default function FileInfoCard(props: FileInfoCardProps) {
                             <Person color="success" />
                         </IconButton>
                     </Tooltip>
+                    <Tooltip title="Mark as Combined">
+                        <IconButton aria-label="combined" key="combined" onClick={() => {
+                            const promise = setRole(props, 'combined');
+                            toast.promise(promise, {
+                                loading: 'Marking as Combined...',
+                                success: 'Marked as Combined',
+                                error: 'Failed to mark as Combined',
+                            });
+                        }
+                        }>
+                            <GraphicEq color="info" />
+                        </IconButton>
+                    </Tooltip>
                     <Tooltip title="Clear Roles">
                         <IconButton aria-label="delete" key="delete" onClick={() => {
                             const promise = removeRoles(props);
@@ -319,7 +334,7 @@ export default function FileInfoCard(props: FileInfoCardProps) {
                     {subStack}
                 </div>
                 <div className="flex-none">
-                    {isDiarized && roleButtonGroup}
+                    {isAudio && roleButtonGroup}
                 </div>
             </div>
         );

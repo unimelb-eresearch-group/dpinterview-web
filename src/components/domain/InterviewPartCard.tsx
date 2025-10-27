@@ -28,6 +28,7 @@ function updateInterviewPart(
     const interview_path = props.interview_path;
 
     const body: Record<string, any> = {};
+    body.interview_path = interview_path;
     body.interview_name = props.interview_name;
     if (is_primary !== undefined) {
         body.is_primary = is_primary;
@@ -38,7 +39,7 @@ function updateInterviewPart(
 
     console.log('Updating interview part:', interview_path, JSON.stringify(body));
 
-    return fetch(`/api/v1/interview-parts?interview_path=${interview_path}`, {
+    return fetch(`/api/v1/interview-parts`, {
         method: 'POST',
         body: JSON.stringify(body),
         headers: {
