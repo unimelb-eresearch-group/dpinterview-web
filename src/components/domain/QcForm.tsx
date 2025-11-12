@@ -16,14 +16,25 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Checkbox } from "@/components/ui/checkbox"
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 import { useEffect } from "react";
 import { DbManualQc } from "@/lib/types/manual_qc";
+import { DbExpectedInterview } from "@/lib/types/interview";
 
 const formSchema = z.object({
     interviewName: z.string().min(1, { message: "Interview name is required" }),
     hasNoIssues: z.boolean(),
     uploadToNda: z.boolean().optional(),
     identifiedIssues: z.array(z.string()).optional(),
+    runsheetIdentifier: z.string().optional(),
     comments: z.string().optional(),
     qcDatetime: z.string().optional(),  // Ignored
     qcUser: z.string().min(1, { message: "QC user is required" }),
@@ -48,6 +59,7 @@ export default function QcForm(
 ) {
     const { interviewName } = props;
     const [ qcData, setQcData ] = useState<DbManualQc | null>(null);
+    const [ subjectExpectedInterviews, setSubjectExpectedInterviews ] = useState<DbExpectedInterview[] | null>(null);
 
     useEffect(() => {
         const fetchInterviewData = async () => {
@@ -70,15 +82,37 @@ export default function QcForm(
     }, [interviewName]);
 
     useEffect(() => {
+        const fetchExpectedInterviews = async () => {
+            // interviewName is in format: studyid-subjectid-interviewType-dayxxxx
+            const parts = interviewName.split("-");
+            const studyId = parts[0];
+            const subjectId = parts[1];
+
+            const response = await fetch(`/api/v3/studies/${studyId}/subjects/${subjectId}/expectedInterviews`);
+            const data = await response.json();
+            if (response.ok) {
+                setSubjectExpectedInterviews(data);
+                // console.log("Fetched subject expected interviews:", subjectExpectedInterviews);
+                // console.log(data);
+            } else {
+                toast.error("Failed to fetch subject expected interviews");
+            }
+        }
+        fetchExpectedInterviews();
+    }, [interviewName]);
+
+    useEffect(() => {
         // console.log("QC data:", qcData);
         if (qcData && qcData.qc_data) {
             form.setValue("hasNoIssues", qcData.qc_data.hasNoIssues);
             form.setValue("identifiedIssues", qcData.qc_data.identifiedIssues || []);
             form.setValue("uploadToNda", qcData.qc_data.uploadToNda || false);
             form.setValue("comments", qcData.qc_data.comments || "");
+            form.setValue("runsheetIdentifier", qcData.qc_data.runsheetIdentifier || "");
             form.setValue("qcDatetime", qcData.qc_timestamp);
             form.setValue("qcUser", qcData.qc_user_id);
         }
+        // console.log("Form values after QC data load:", form.getValues());
     }, [qcData]);
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -89,6 +123,7 @@ export default function QcForm(
             identifiedIssues: [],
             uploadToNda: false,
             comments: "",
+            runsheetIdentifier: "",
             qcDatetime: new Date().toISOString(),
             qcUser: "",
         },
@@ -288,6 +323,52 @@ export default function QcForm(
                                         </FormControl>
                                         <FormDescription>
                                             Any additional comments or notes about the interview.
+                                        </FormDescription>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="runsheetIdentifier"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel>Runsheet Identifier</FormLabel>
+                                        <div className="flex gap-2">
+                                            <Select onValueChange={field.onChange} value={field.value}>
+                                                <FormControl>
+                                                    <SelectTrigger className="bg-white w-full">
+                                                        <SelectValue placeholder="Override Default / Closest Runsheet" />
+                                                    </SelectTrigger>
+                                                </FormControl>
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                        <SelectLabel>Expected Interviews</SelectLabel>
+                                                        {subjectExpectedInterviews?.map((interview) => (
+                                                            <SelectItem 
+                                                                key={interview.interview_name} 
+                                                                value={interview.interview_name}
+                                                            >
+                                                                {interview.interview_name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
+                                            {field.value && (
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    size="icon"
+                                                    onClick={() => field.onChange("")}
+                                                >
+                                                    ✕
+                                                </Button>
+                                            )}
+                                        </div>
+                                        <FormDescription>
+                                            Use this to override auto assigned Runsheet.
                                         </FormDescription>
                                         <FormMessage />
                                     </FormItem>

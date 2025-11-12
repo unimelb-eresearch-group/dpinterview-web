@@ -11,6 +11,7 @@ export type DbManualQc = {
         identifiedIssues: string[];
         uploadToNda?: boolean;
         comments?: string;
+        runsheetIdentifier?: string;
     }
     qc_user_id: string;
     qc_timestamp: string;

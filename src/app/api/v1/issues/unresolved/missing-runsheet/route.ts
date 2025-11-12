@@ -22,32 +22,39 @@ export async function GET(request: Request): Promise<Response> {
     const offset = url.searchParams.get('offset') || 0;
 
     const baseQuery = `
-SELECT
-    i.interview_name,
-    i.interview_type AS interview_type,
-    i.subject_id,
-    i.study_id,
-    MIN(ip.interview_day) AS earliest_interview_day
-FROM
-    public.interviews i
-    INNER JOIN public.interview_parts ip ON i.interview_name = ip.interview_name
-WHERE
-    NOT EXISTS (
-        SELECT
-            1
-        FROM
-            public.expected_interviews e
-        WHERE
-            e.subject_id = i.subject_id
-            AND e.study_id = i.study_id
-            AND e.expected_interview_type = i.interview_type
-            AND ABS(e.expected_interview_day - ip.interview_day) <= 10
+SELECT  
+    i.interview_name,  
+    i.interview_type AS interview_type,  
+    i.subject_id,  
+    i.study_id,  
+    MIN(ip.interview_day) AS earliest_interview_day  
+FROM  
+    public.interviews i  
+    INNER JOIN public.interview_parts ip ON i.interview_name = ip.interview_name  
+WHERE  
+    NOT EXISTS (  
+        SELECT 1  
+        FROM public.expected_interviews e  
+        WHERE  
+            e.subject_id = i.subject_id  
+            AND e.study_id = i.study_id  
+            AND e.expected_interview_type = i.interview_type  
+            AND ABS(e.expected_interview_day - ip.interview_day) <= 10  
     )
-GROUP BY
-    i.interview_name,
-    i.interview_type,
-    i.subject_id,
+    AND NOT EXISTS (
+        SELECT 1
+        FROM public.manual_qc mq
+        WHERE 
+            mq.qc_target_id = i.interview_name
+            AND mq.qc_target_type = 'interview'
+            AND mq.qc_data->>'runsheetIdentifier' IS NOT NULL
+    )
+GROUP BY  
+    i.interview_name,  
+    i.interview_type,  
+    i.subject_id,  
     i.study_id
+ORDER BY i.interview_name
 `;
 
     const countQuery = `SELECT COUNT(*) FROM (${baseQuery}) AS total_count`;

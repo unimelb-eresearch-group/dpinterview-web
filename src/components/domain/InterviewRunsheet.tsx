@@ -9,6 +9,7 @@ import Skeleton from '@mui/material/Skeleton';
 import Tooltip from '@mui/material/Tooltip';
 
 import { FormDataM } from '@/lib/types/form_data';
+import { DbManualQc } from '@/lib/types/manual_qc';
 import { DataDictionaryM } from '@/lib/types/data_dictionary';
 
 export type InterviewRunsheetProps = {
@@ -16,15 +17,33 @@ export type InterviewRunsheetProps = {
 };
 
 export default function InterviewRunsheet(props: InterviewRunsheetProps) {
-    const { interviewName } = props;
+    let { interviewName } = props;
 
     const [formData, setFormData] = useState<FormDataM | null>(null);
     const [dataDictionary, setDataDictionary] = useState<DataDictionaryM[]>([]);
     const [formRecords, setFormRecords] = useState<Record<string, string | null>[]>([]);
     const [usingClosestRunsheet, setUsingClosestRunsheet] = useState(false);
+    const [usingManualOverride, setUsingManualOverride] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
+            const qcResponse = await fetch(`/api/v2/interviews/${interviewName}/qc`);
+            if (qcResponse.ok) {
+                const qcData: DbManualQc[] = await qcResponse.json();
+                console.log("Fetched QC data for runsheet override:", qcData);
+
+                // Check if qcData is an array and has elements
+                if (Array.isArray(qcData) && qcData.length > 0) {
+                    const latestQc = qcData[0];
+                    const runsheetIdentifier = latestQc?.qc_data?.runsheetIdentifier;
+
+                    if (runsheetIdentifier) {
+                        setUsingManualOverride(true);
+                        interviewName = runsheetIdentifier;
+                    }
+                }
+            }
+
             const response = await fetch(`/api/v2/interviews/${interviewName}/runsheet`);
             if (response.redirected) {
                 setUsingClosestRunsheet(true);
@@ -130,7 +149,11 @@ export default function InterviewRunsheet(props: InterviewRunsheetProps) {
             {formData ? (
                 <div className="flex flex-row items-center gap-2">
                     <h3 className="text-md font-semibold text-gray-800">
-                        {usingClosestRunsheet ? "Closest Runsheet" : "Runsheet"}
+                        {usingManualOverride
+                            ? "Overridden Runsheet"
+                            : usingClosestRunsheet
+                                ? "Closest Runsheet"
+                                : "Runsheet"}
                     </h3>
                     <div className="flex items-center gap-2 ml-2 text-gray-600">
                         <span className="font-medium">{formData.interview_name}</span>
