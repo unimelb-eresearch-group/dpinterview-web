@@ -9,8 +9,9 @@ target "dashboard" {
     nodejs_lts = "docker-image://node:24-alpine"
   }
   dockerfile = "container/Dockerfile"
-  tags = [
-    "ghcr.io/dptools/dashboard:latest", // pseudo container name
-  ]
 }
 
+target "validate-build" {
+  inherits = ["dashboard"]
+  call = "check"
+}
