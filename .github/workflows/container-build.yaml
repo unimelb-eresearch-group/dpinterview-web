@@ -29,6 +29,8 @@ jobs:
       - name: Validate build configuration
         uses: docker/bake-action@v6
         with:
+          files: |
+            ./container/docker-bake.hcl
           targets: validate-build
       - name: Extract metadata
         id: meta
