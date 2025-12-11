@@ -37,6 +37,7 @@ jobs:
         env:
           SOURCE_DATE_EPOCH: ${{ env.TIMESTAMP }}
         with:
+          targets: dashboard
           push: true
           files: |
             ./container/docker-bake.hcl
@@ -47,6 +48,7 @@ jobs:
         env:
           SOURCE_DATE_EPOCH: ${{ env.TIMESTAMP }}
         with:
+          targets: dashboard
           push: true
           files: |
             ./container/docker-bake.hcl
