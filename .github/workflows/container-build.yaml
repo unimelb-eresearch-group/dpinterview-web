@@ -49,6 +49,7 @@ jobs:
             ./container/docker-bake.hcl
             cwd://${{ steps.meta.outputs.bake-file }}
       - name: Build and push
+        id: push
         uses: docker/bake-action@v6
         if: ${{ github.event_name != 'pull_request' }}
         env:
@@ -64,5 +65,5 @@ jobs:
         if: ${{ github.event_name != 'pull_request' }}
         with:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
-          subject-digest: ${{ steps.push.outputs.digest }}
+          subject-digest: ${{ steps.push.outputs.metadata.containerimage.digest }}
           push-to-registry: true
